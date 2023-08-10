@@ -2,7 +2,10 @@ public class Contact {
 
     private String name;
     private String number;
-
+    public Contact(String name) {
+        this.name = name;
+        this.number = "default";
+    }
     public Contact(String name, String number) {
         this.name = name;
         this.number = number;
