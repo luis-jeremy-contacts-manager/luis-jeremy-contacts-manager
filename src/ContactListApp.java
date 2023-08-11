@@ -8,11 +8,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ContactListApp {
     public static Input input = new Input();
-    private static Path contactFilePath = Paths.get("src/contacts.txt");
-    public static void main(String[] args) {
+    public static Path contactFilePath = Paths.get("src/contacts.txt");
+    public static void main(String[] args) throws IOException {
         trigger();
     }
 
@@ -28,7 +29,7 @@ public class ContactListApp {
         );
     }
 
-    public static void trigger() {
+    public static void trigger() throws IOException {
 //        ArrayList list = createArray();
         //display menu here
         displayMenu();
@@ -39,7 +40,7 @@ public class ContactListApp {
             case 2 -> addNewContact();
             case 3 -> searchContact();
             case 4 ->  deleteContact();
-//            case 5 -> System.out.println("Good day!");;
+            case 5 -> System.out.println("Good day!");
             default -> System.out.println("Error. Invalid selection");
         }
     }
@@ -161,29 +162,46 @@ public class ContactListApp {
         return request;
     }
 
-    public static void deleteContact() {
-        String contactToDelete = searchContact();
-        System.out.println("Are you sure you want to delete contact? (Y/N)");
-        boolean userInput = input.yesNo();
-        if(userInput){
-            for(Contact contact : createArray()) {
-//                String[] result = contact.split(" ");
-                String name = contact.getName();
-                if (contactToDelete.contains(name)) {
-                    System.out.println(name);
+//    public static void deleteContact() {
+//        String contactToDelete = searchContact();
+//        System.out.println("Are you sure you want to delete contact? (Y/N)");
+//        boolean userInput = input.yesNo();
+//        ArrayList<Contact> contacts =  createArray();
+//        if(userInput){
+//            for(Contact contact : createArray()) {
+//                String name = contact.getName();
+//           contacts.removeIf(Contact -> contact.getName().equalsIgnoreCase(name));
+//                System.out.println(contact.getName());
+//
+//            }
+//        }
+//
+//
+//    }
 
-                }
-//                else {
-//                    System.out.println("It didn't work");
-//                }
+    public static void deleteContact() throws IOException {
+        ArrayList<Contact> contacts =  createArray();
+        System.out.println("Enter the contact name to delete");
+        String contactToDelete = input.getString();
+        for (Contact contact : contacts) {
+            if (contact.getName().equalsIgnoreCase(contactToDelete)) {
+                contacts.remove(contact);
+                break;
             }
-//           for(Contact contact : createArray()){
-//               System.out.println(contact.getName());
-//               System.out.println(contact.getNumber());
-//           }
         }
-
-
+        System.out.println(contacts);
+       updateTxtFile(contacts);
     }
+
+    static void updateTxtFile(ArrayList<Contact> contacts) throws IOException {
+        ArrayList<String> stringContacts = new ArrayList<>();
+        for (Contact contact : contacts) {
+            String stringContact = contact.getName() + " " + contact.getNumber();
+            stringContacts.add(stringContact);
+            Files.write(contactFilePath, stringContacts, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        }
+    }
+
 //ending curly brace
 }
