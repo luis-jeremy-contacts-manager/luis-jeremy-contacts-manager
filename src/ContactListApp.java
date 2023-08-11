@@ -40,8 +40,8 @@ public class ContactListApp {
         switch (userMenuSelection) {
             case 1 -> viewContacts();
             case 2 -> addNewContact();
-//            case 3 -> searchContact();
-//            case 4 ->  deleteContact();
+            case 3 -> searchContact();
+            case 4 ->  deleteContact();
 //            case 5 -> System.out.println("Good day!");;
             default -> System.out.println("Error. Invalid selection");
         }
@@ -64,6 +64,8 @@ public class ContactListApp {
         }
         return contacts;
     }
+
+
 
     public static void viewContacts() {
         try {
@@ -117,6 +119,43 @@ public class ContactListApp {
             return validatePhoneLength();
         }
 
+    }
+
+    public static String searchContact() {
+        System.out.println("Enter contact name");
+        String searchQuery = input.getString();
+        String request = "";
+        try {
+            List<String> lineOfTexts = Files.readAllLines(
+                    Paths.get("src/contacts.txt")
+            );
+            for (String text : lineOfTexts) {
+                if (text.contains(searchQuery)){
+                    request = text;
+
+                }
+
+            }
+                if (request.length() == 0) {
+                    System.out.println("No contact was found.");
+                }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(request);
+        return request;
+    }
+
+    public static void deleteContact() {
+        String contactToDelete = searchContact();
+        try {
+            List<String> lineOfTexts = Files.readAllLines(
+                    Paths.get("src/contacts.txt")
+            );
+           lineOfTexts.listIterator();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 //ending curly brace
 }
