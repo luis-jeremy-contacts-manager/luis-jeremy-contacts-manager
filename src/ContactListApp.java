@@ -8,11 +8,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ContactListApp {
     public static Input input = new Input();
-    private static Path contactFilePath = Paths.get("src/contacts.txt");
-    public static void main(String[] args) {
+    public static Path contactFilePath = Paths.get("src/contacts.txt");
+    public static void main(String[] args) throws IOException {
         trigger();
     }
 
@@ -28,9 +29,7 @@ public class ContactListApp {
         );
     }
 
-    public static void trigger() {
-//        ArrayList list = createArray();
-        //display menu here
+    public static void trigger() throws IOException {
         displayMenu();
         int userMenuSelection = input.getInt(1, 5);
 
@@ -39,12 +38,11 @@ public class ContactListApp {
             case 2 -> addNewContact();
             case 3 -> searchContact();
             case 4 ->  deleteContact();
-//            case 5 -> System.out.println("Good day!");;
+            case 5 -> System.out.println("Good day!");
             default -> System.out.println("Error. Invalid selection");
         }
     }
-
-    public static ArrayList createArray(String newName, String newNumber) {
+    public static ArrayList<Contact>  createArray() {
         ArrayList<Contact> contacts = new ArrayList<>();
         try {
             List<String> contactListFile = Files.readAllLines(
@@ -53,26 +51,7 @@ public class ContactListApp {
             for (String text : contactListFile) {
                 String[] result = text.split(" ");
                 String name = result[0];
-                String number = result[1] + result[2];
-                contacts.add(new Contact(name, number));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(contacts);
-        return contacts;
-    }
-    public
-    static ArrayList<Contact>  createArray() {
-        ArrayList<Contact> contacts = new ArrayList<>();
-        try {
-            List<String> contactListFile = Files.readAllLines(
-                    Paths.get("src/contacts.txt")
-            );
-            for (String text : contactListFile) {
-                String[] result = text.split(" ");
-                String name = result[0];
-                String number = result[1] + result[2];
+                String number = result[1] + " " + result[2] ;
                 contacts.add(new Contact(name, number));
             }
         } catch (IOException e) {
@@ -97,17 +76,11 @@ public class ContactListApp {
     }
 
     public static void addNewContact() {
-        try {
             System.out.println("Enter new contact name: ");
             String contactName = input.getString();
+        try {
             String newContactPhoneNumber = validatePhoneLength();
-            createArray(contactName, newContactPhoneNumber);
-//            for(Contact contact : createArray()){
-//                System.out.println(contact.getName());
-//                System.out.println(contact.getNumber());
-//            }
             String newContact = contactName + " " + newContactPhoneNumber;
-
             Files.write(contactFilePath, Collections.singletonList(newContact), StandardOpenOption.APPEND);
         }catch(IOException e){
             e.printStackTrace();
@@ -118,12 +91,12 @@ public class ContactListApp {
         System.out.println("Enter new contact phone number: ");
         int contactNumber = input.getInt();
         String contactPhone = String.valueOf(contactNumber);
-        String formattedPhone = "";
+        String formattedPhone = " ";
         if (contactPhone.length() == 10) {
             String firstThree = contactPhone.substring(0, 3);
             String secondThree = contactPhone.substring(3, 6);
             String lastFour = contactPhone.substring(6, 10);
-            formattedPhone = "(" + firstThree + ") " + secondThree + "-" + lastFour;
+            formattedPhone = "(" + firstThree + ")" + " " + secondThree + "-" + lastFour;
             return formattedPhone;
         } else if (contactPhone.length() == 7) {
             String firstThree = contactPhone.substring(0, 3);
@@ -161,29 +134,28 @@ public class ContactListApp {
         return request;
     }
 
-    public static void deleteContact() {
-        String contactToDelete = searchContact();
-        System.out.println("Are you sure you want to delete contact? (Y/N)");
-        boolean userInput = input.yesNo();
-        if(userInput){
-            for(Contact contact : createArray()) {
-//                String[] result = contact.split(" ");
-                String name = contact.getName();
-                if (contactToDelete.contains(name)) {
-                    System.out.println(name);
-
-                }
-//                else {
-//                    System.out.println("It didn't work");
-//                }
+    public static void deleteContact() throws IOException {
+        ArrayList<Contact> contacts =  createArray();
+        System.out.println("Enter the contact name to delete");
+        String contactToDelete = input.getString();
+        for (Contact contact : contacts) {
+            if (contact.getName().equalsIgnoreCase(contactToDelete)) {
+                contacts.remove(contact);
+                break;
             }
-//           for(Contact contact : createArray()){
-//               System.out.println(contact.getName());
-//               System.out.println(contact.getNumber());
-//           }
         }
-
-
+       updateTxtFile(contacts);
     }
+
+    static void updateTxtFile(ArrayList<Contact> contacts) throws IOException {
+        ArrayList<String> stringContacts = new ArrayList<>();
+        for (Contact contact : contacts) {
+            String stringContact = contact.getName() + " " + contact.getNumber();
+            stringContacts.add(stringContact);
+            Files.write(contactFilePath, stringContacts, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        }
+    }
+
 //ending curly brace
 }
