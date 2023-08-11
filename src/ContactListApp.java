@@ -29,10 +29,7 @@ public class ContactListApp {
     }
 
     public static void trigger() {
-        ArrayList list = createArray();
-//        Input input = new Input();
-//        Path contactFilePath = Paths.get("src/contacts.txt");
-        System.out.println(createArray());
+//        ArrayList list = createArray();
         //display menu here
         displayMenu();
         int userMenuSelection = input.getInt(1, 5);
@@ -45,26 +42,44 @@ public class ContactListApp {
 //            case 5 -> System.out.println("Good day!");;
             default -> System.out.println("Error. Invalid selection");
         }
-        ;
-
-
     }
 
-    public static ArrayList createArray() {
+    public static ArrayList createArray(String newName, String newNumber) {
         ArrayList<Contact> contacts = new ArrayList<>();
         try {
             List<String> contactListFile = Files.readAllLines(
                     Paths.get("src/contacts.txt")
             );
             for (String text : contactListFile) {
-                contacts.add(new Contact(text));
+                String[] result = text.split(" ");
+                String name = result[0];
+                String number = result[1] + result[2];
+                contacts.add(new Contact(name, number));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(contacts);
+        return contacts;
+    }
+    public
+    static ArrayList<Contact>  createArray() {
+        ArrayList<Contact> contacts = new ArrayList<>();
+        try {
+            List<String> contactListFile = Files.readAllLines(
+                    Paths.get("src/contacts.txt")
+            );
+            for (String text : contactListFile) {
+                String[] result = text.split(" ");
+                String name = result[0];
+                String number = result[1] + result[2];
+                contacts.add(new Contact(name, number));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return contacts;
     }
-
 
 
     public static void viewContacts() {
@@ -75,7 +90,6 @@ public class ContactListApp {
             for (String text : lineOfTexts) {
                 System.out.println(text);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,14 +101,17 @@ public class ContactListApp {
             System.out.println("Enter new contact name: ");
             String contactName = input.getString();
             String newContactPhoneNumber = validatePhoneLength();
+            createArray(contactName, newContactPhoneNumber);
+//            for(Contact contact : createArray()){
+//                System.out.println(contact.getName());
+//                System.out.println(contact.getNumber());
+//            }
             String newContact = contactName + " " + newContactPhoneNumber;
+
             Files.write(contactFilePath, Collections.singletonList(newContact), StandardOpenOption.APPEND);
-//            Files.write(contactFilePath, Collections.singletonList(newContactPhoneNumber), StandardOpenOption.APPEND);
         }catch(IOException e){
             e.printStackTrace();
         }
-
-
     }
 
     public static String validatePhoneLength() {
@@ -132,9 +149,7 @@ public class ContactListApp {
             for (String text : lineOfTexts) {
                 if (text.contains(searchQuery)){
                     request = text;
-
                 }
-
             }
                 if (request.length() == 0) {
                     System.out.println("No contact was found.");
@@ -148,14 +163,27 @@ public class ContactListApp {
 
     public static void deleteContact() {
         String contactToDelete = searchContact();
-        try {
-            List<String> lineOfTexts = Files.readAllLines(
-                    Paths.get("src/contacts.txt")
-            );
-           lineOfTexts.listIterator();
-        } catch (IOException e) {
-            e.printStackTrace();
+        System.out.println("Are you sure you want to delete contact? (Y/N)");
+        boolean userInput = input.yesNo();
+        if(userInput){
+            for(Contact contact : createArray()) {
+//                String[] result = contact.split(" ");
+                String name = contact.getName();
+                if (contactToDelete.contains(name)) {
+                    System.out.println(name);
+
+                }
+//                else {
+//                    System.out.println("It didn't work");
+//                }
+            }
+//           for(Contact contact : createArray()){
+//               System.out.println(contact.getName());
+//               System.out.println(contact.getNumber());
+//           }
         }
+
+
     }
 //ending curly brace
 }
